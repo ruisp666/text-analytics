@@ -45,3 +45,5 @@ def extract_call_transcript(ticker: str, quarter: int, year: int):
     obj = get_jsonparsed_data(url)
     transcript = obj[0]['content']
     return transcript
+
+
