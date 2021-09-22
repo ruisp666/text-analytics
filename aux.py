@@ -1,9 +1,10 @@
 import json
 from urllib.request import urlopen
 import pickle
+import re
 
 def get_api_key():
-    f = open('../keys/key', 'rb')
+    f = open('../keys/key.pickle', 'rb')
     api_key = pickle.load(f)['key']
     f.close()
     return api_key
@@ -46,4 +47,12 @@ def extract_call_transcript(ticker: str, quarter: int, year: int):
     transcript = obj[0]['content']
     return transcript
 
+
+def nlp_tag_sentences_by_characters(transcript,  spacy_model, pattern='.*\$|.*\%'):
+    transcript = re.sub(r'\.([a-zA-Z])', r'. \1', transcript) # Add 1 space after periods with letters
+    transcript= re.sub('/\s\s+/g', ' ', transcript) # Reduce multiple white spaces to a single space
+    doc_parsed = spacy_model(transcript)
+    doc_sentences  = [sen for sen in doc_parsed.sents]
+    tagged_sentences = [(i, s.text) for i, s in enumerate(doc_sentences) if re.search(pattern, s.text)] #match sentences with the pattern
+    return doc_parsed, tagged_sentences
 
